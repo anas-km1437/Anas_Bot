@@ -3,17 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anos Bot | بوت أنوس</title>
+    <title>Anos Bot | عالم أنوس </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_with_fallback('static', filename='style.css') }}">
 </head>
 <body>
 
+    <div class="romantic-background">
+        <div class="heart h1">❤️</div>
+        <div class="heart h2">💖</div>
+        <div class="heart h3">💗</div>
+        <div class="heart h4">💓</div>
+        <div class="heart h5">💕</div>
+        <div class="heart h6">❤️</div>
+    </div>
+
     <div class="app-container">
         
         <aside class="sidebar" id="sidebar">
-            <button class="new-chat-btn" id="newChatBtn">
-                <i class="fa-plus fa-solid"></i> محادثة جديدة
+            <button class="new-chat-btn pulse-button" id="newChatBtn">
+                <i class="fa-heart fa-solid"></i> محادثة حب جديدة
             </button>
             <div class="sessions-list" id="sessionsList">
                 </div>
@@ -25,27 +34,33 @@
                     <i class="fa-bars fa-solid"></i>
                 </button>
                 <div class="bot-info">
-                    <span class="bot-avatar">🤖</span>
+                    <div class="avatar-wrapper">
+                        <img src="{{ url_with_fallback('static', filename='bot_avatar.png') }}" alt="Anos Bot" class="bot-avatar-img">
+                        <div class="bot-sparkle"></div>
+                    </div>
                     <div>
                         <h2>Anos Bot</h2>
-                        <small>متصل دائماً لأجلكِ</small>
+                        <small>بانتظاركِ دائماً</small>
                     </div>
+                </div>
+                <div class="header-decoration">
+                    <i class="fa-spa fa-solid floral-icon"></i>
                 </div>
             </header>
 
             <section class="messages-container" id="messagesContainer">
                 <div class="welcome-screen" id="welcomeScreen">
-                    <span class="welcome-icon">❤️</span>
-                    <h3>أهلاً بكِ في عالم أنوس</h3>
-                    <p>ابدئي محادثة جديدة أو اختاري من الأرشيف الجانبي وسأكون هنا للرد عليكِ فوراً.</p>
+                    <span class="welcome-icon glow-heart">❤️</span>
+                    <h3>مرحباً بكِ في عالمنا</h3>
+                    <p>ابدئي محادثة جديدة أو اختاري من الأرشيف وسأكون هنا لأجلكِ.</p>
                 </div>
             </section>
 
             <footer class="chat-footer">
                 <form class="input-form" id="chatForm">
-                    <input type="text" id="userInput" placeholder="اكتبي رسالتكِ هنا..." autocomplete="off" required>
-                    <button type="submit" id="sendBtn">
-                        <i class="fa-paper-plane fa-solid"></i>
+                    <input type="text" id="userInput" placeholder="اكتبي ما في قلبكِ..." autocomplete="off" required>
+                    <button type="submit" id="sendBtn" class="send-button">
+                        <i class="fa-heart fa-solid input-heart"></i>
                     </button>
                 </form>
             </footer>
