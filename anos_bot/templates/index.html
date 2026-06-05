@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anos Bot | بوت أنوس</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_with_fallback('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <aside class="sidebar" id="sidebar">
+            <button class="new-chat-btn" id="newChatBtn">
+                <i class="fa-plus fa-solid"></i> محادثة جديدة
+            </button>
+            <div class="sessions-list" id="sessionsList">
+                </div>
+        </aside>
+
+        <main class="chat-main">
+            <header class="chat-header">
+                <button class="toggle-sidebar-btn" id="toggleSidebar">
+                    <i class="fa-bars fa-solid"></i>
+                </button>
+                <div class="bot-info">
+                    <span class="bot-avatar">🤖</span>
+                    <div>
+                        <h2>Anos Bot</h2>
+                        <small>متصل دائماً لأجلكِ</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="messages-container" id="messagesContainer">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <span class="welcome-icon">❤️</span>
+                    <h3>أهلاً بكِ في عالم أنوس</h3>
+                    <p>ابدئي محادثة جديدة أو اختاري من الأرشيف الجانبي وسأكون هنا للرد عليكِ فوراً.</p>
+                </div>
+            </section>
+
+            <footer class="chat-footer">
+                <form class="input-form" id="chatForm">
+                    <input type="text" id="userInput" placeholder="اكتبي رسالتكِ هنا..." autocomplete="off" required>
+                    <button type="submit" id="sendBtn">
+                        <i class="fa-paper-plane fa-solid"></i>
+                    </button>
+                </form>
+            </footer>
+        </main>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script src="{{ url_with_fallback('static', filename='script.js') }}"></script>
+</body>
+</html>

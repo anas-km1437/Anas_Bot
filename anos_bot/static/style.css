@@ -1,0 +1,262 @@
+:root {
+    --bg-dark: #1e1e2e;
+    --sidebar-bg: #11111b;
+    --chat-bg: #181825;
+    --text-main: #cdd6f4;
+    --text-muted: #a6adc8;
+    --primary: #cba6f7;
+    --user-bubble: #89b4fa;
+    --bot-bubble: #313244;
+    --input-bg: #313244;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* حاوي التطبيق الأساسي بنظام Grid */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ستايل القائمة الجانبية */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border-left: 1px solid #313244;
+    transition: transform 0.3s ease;
+    z-index: 99;
+}
+
+.new-chat-btn {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid #45475a;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    transition: background 0.2s;
+    margin-bottom: 15px;
+}
+
+.new-chat-btn:hover {
+    background-color: #313244;
+}
+
+.sessions-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.session-item {
+    padding: 10px 12px;
+    background-color: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.2s;
+}
+
+.session-item:hover, .session-item.active {
+    background-color: #313244;
+    color: var(--primary);
+}
+
+/* شاشة المحادثة الرئيسية */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--chat-bg);
+    position: relative;
+}
+
+.chat-header {
+    height: 60px;
+    background-color: var(--sidebar-bg);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 15px;
+    border-bottom: 1px solid #313244;
+}
+
+.toggle-sidebar-btn {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    font-size: 20px;
+    cursor: pointer;
+    display: none; /* يظهر في الجوال فقط */
+}
+
+.bot-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bot-info h2 {
+    font-size: 16px;
+}
+
+.bot-info small {
+    color: #a6e3a1;
+}
+
+/* حاوية الرسائل */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.welcome-screen {
+    text-align: center;
+    margin: auto;
+    max-width: 400px;
+}
+
+.welcome-icon {
+    font-size: 50px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.welcome-screen p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* فقاعات الرسائل */
+.message-bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.message-bubble.user {
+    align-self: flex-start;
+    background-color: var(--user-bubble);
+    color: #11111b;
+    border-top-right-radius: 2px;
+}
+
+.message-bubble.bot {
+    align-self: flex-end;
+    background-color: var(--bot-bubble);
+    color: var(--text-main);
+    border-top-left-radius: 2px;
+}
+
+/* صندوق الكتابة السفلي */
+.chat-footer {
+    padding: 20px;
+    background-color: var(--chat-bg);
+}
+
+.input-form {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    background-color: var(--input-bg);
+    border-radius: 10px;
+    padding: 5px 10px;
+    align-items: center;
+}
+
+.input-form input {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 12px;
+    color: var(--text-main);
+    font-size: 15px;
+}
+
+.input-form input:focus {
+    outline: none;
+}
+
+.input-form button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.1s;
+}
+
+.input-form button:active {
+    transform: scale(0.9);
+}
+
+/* طبقة حماية للجوال */
+.sidebar-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 98;
+    display: none;
+}
+
+/* ==================== استعلامات الشاشات (Responsiveness) ==================== */
+
+@media (max-width: 768px) {
+    .toggle-sidebar-btn {
+        display: block; /* تظهر أيقونة فتح القائمة */
+    }
+
+    .sidebar {
+        position: fixed;
+        right: 0; /* لأن المتصفح RTL */
+        top: 0;
+        bottom: 0;
+        transform: translateX(100%); /* إخفاء خارج الشاشة يميناً */
+    }
+
+    .sidebar.active {
+        transform: translateX(0); /* إظهار القائمة */
+    }
+
+    .sidebar.active ~ .sidebar-overlay {
+        display: block;
+    }
+
+    .message-bubble {
+        max-width: 85%; /* زيادة عرض الفقاعة لتناسب الشاشات الصغيرة */
+    }
+}
