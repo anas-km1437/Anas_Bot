@@ -42,7 +42,7 @@ if GEMINI_API_KEY:
     
     # استخدام نموذج فلاش لأنه سريع جداً في الشات
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-1.5-flash-latest",
         system_instruction=system_instruction
     )
 else:
