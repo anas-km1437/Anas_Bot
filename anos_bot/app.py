@@ -40,7 +40,7 @@ if GEMINI_API_KEY:
         genai.configure(api_key=GEMINI_API_KEY)
         # تم اختيار gemini-2.0-flash لأنه متاح في قائمة حسابك الرسمية
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-flash-latest", 
             system_instruction=system_instruction
         )
     except Exception as e:
