@@ -1,65 +1,107 @@
+/* ==================== باليت الألوان والمتغيرات ==================== */
 :root {
-    --bg-dark: #1e1e2e;
-    --sidebar-bg: #11111b;
-    --chat-bg: #181825;
-    --text-main: #cdd6f4;
-    --text-muted: #a6adc8;
-    --primary: #cba6f7;
-    --user-bubble: #89b4fa;
-    --bot-bubble: #313244;
-    --input-bg: #313244;
+    --bg-main: #fdf2f8; /* Blush Pink فاتح جداً */
+    --sidebar-bg: #f3e8ff; /* Lavender فاتح */
+    --chat-bg: #fff; /* أبيض نقي للمحادثة */
+    --text-main: #6b21a8; /* بنفجسي غامق */
+    --text-muted: #8b5cf6; /* بنفجسي فاتح */
+    --primary: #f87171; /* أحمر وردي دافئ */
+    --gold: #fcd34d; /* ذهبي فاتح للتفاصيل */
+    --user-bubble: #fbcfe8; /* وردي ناعم لحنان */
+    --bot-bubble: #ede9fe; /* لافندر ناعم للبوت */
+    --input-bg: #fff;
+    --border-color: #d8b4fe;
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Kufi', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background-color: var(--bg-dark);
+    background-color: var(--bg-main);
     color: var(--text-main);
     height: 100vh;
     overflow: hidden;
+    position: relative;
 }
 
-/* حاوي التطبيق الأساسي بنظام Grid */
+/* ==================== تأثير القلوب العائمة (الخلفية) ==================== */
+.romantic-background {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.heart {
+    position: absolute;
+    bottom: -100px;
+    font-size: 20px;
+    animation: floatUp 15s linear infinite;
+    opacity: 0.6;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+    100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+}
+
+/* توزيع القلوب العائمة */
+.h1 { left: 10%; animation-delay: 0s; font-size: 25px; }
+.h2 { left: 25%; animation-delay: 2s; font-size: 18px; }
+.h3 { left: 40%; animation-delay: 4s; font-size: 30px; }
+.h4 { left: 60%; animation-delay: 6s; font-size: 22px; }
+.h5 { left: 75%; animation-delay: 8s; font-size: 15px; }
+.h6 { left: 85%; animation-delay: 10s; font-size: 28px; }
+
+/* ==================== حاوي التطبيق الأساسي ==================== */
 .app-container {
     display: flex;
     height: 100vh;
     width: 100vw;
 }
 
-/* ستايل القائمة الجانبية */
+/* ==================== ستايل القائمة الجانبية (الأرشيف) ==================== */
 .sidebar {
-    width: 260px;
+    width: 280px;
     background-color: var(--sidebar-bg);
     display: flex;
     flex-direction: column;
-    padding: 15px;
-    border-left: 1px solid #313244;
+    padding: 20px;
+    border-left: 1px solid var(--border-color);
     transition: transform 0.3s ease;
     z-index: 99;
 }
 
 .new-chat-btn {
-    background-color: transparent;
-    color: var(--text-main);
-    border: 1px solid #45475a;
-    padding: 12px;
-    border-radius: 8px;
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 14px;
-    transition: background 0.2s;
-    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 25px;
+    transition: background 0.2s, transform 0.1s;
+    box-shadow: 0 4px 6px rgba(248, 113, 113, 0.3);
 }
 
-.new-chat-btn:hover {
-    background-color: #313244;
+.new-chat-btn:hover { background-color: #fca5a5; }
+.new-chat-btn:active { transform: scale(0.98); }
+
+/* حركة النبض لزر "محادثة جديدة" */
+.pulse-button { animation: pulse 2s infinite; }
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
 }
 
 .sessions-list {
@@ -67,27 +109,44 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
 }
 
+/* ستايل السحب لقائمة المحادثات */
 .session-item {
-    padding: 10px 12px;
-    background-color: transparent;
-    border-radius: 6px;
+    padding: 12px 16px;
+    background-color: white;
+    border-radius: 15px; /* شكل منحني */
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* شكل القلب على الجنب عند الاختيار */
+.session-item::before {
+    content: '❤️';
+    position: absolute;
+    right: -20px;
+    transition: right 0.2s;
+    opacity: 0;
 }
 
 .session-item:hover, .session-item.active {
-    background-color: #313244;
-    color: var(--primary);
+    background-color: var(--user-bubble);
+    color: #b91c1c;
+    border-color: var(--primary);
+    transform: translateX(-5px); /* حركة بسيطة يميناً */
 }
 
-/* شاشة المحادثة الرئيسية */
+.session-item.active::before { right: 8px; opacity: 1; }
+
+/* ==================== شاشة المحادثة الرئيسية ==================== */
 .chat-main {
     flex: 1;
     display: flex;
@@ -96,167 +155,183 @@ body {
     position: relative;
 }
 
+/* هيدر رومانسي مزين */
 .chat-header {
-    height: 60px;
+    height: 70px;
     background-color: var(--sidebar-bg);
     display: flex;
     align-items: center;
-    padding: 0 20px;
-    gap: 15px;
-    border-bottom: 1px solid #313244;
+    padding: 0 25px;
+    gap: 20px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
 }
 
 .toggle-sidebar-btn {
     background: none;
     border: none;
     color: var(--text-main);
-    font-size: 20px;
+    font-size: 22px;
     cursor: pointer;
-    display: none; /* يظهر في الجوال فقط */
+    display: none; /* يظهر في الجوال */
 }
 
 .bot-info {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.bot-info h2 {
-    font-size: 16px;
-}
-
-.bot-info small {
-    color: #a6e3a1;
-}
-
-/* حاوية الرسائل */
-.messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
     gap: 15px;
 }
 
-.welcome-screen {
-    text-align: center;
-    margin: auto;
-    max-width: 400px;
+.avatar-wrapper { position: relative; }
+.bot-avatar-img {
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 10px rgba(252, 211, 77, 0.5);
 }
 
-.welcome-icon {
-    font-size: 50px;
-    display: block;
-    margin-bottom: 15px;
+/* تأثير التوهج للبوت */
+.bot-sparkle {
+    position: absolute; top: -5px; right: -5px;
+    width: 15px; height: 15px;
+    background-color: var(--gold);
+    border-radius: 50%;
+    animation: sparkle 1.5s infinite;
+}
+@keyframes sparkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+.bot-info h2 { font-size: 18px; color: #b91c1c; }
+.bot-info small { color: #16a34a; font-weight: bold; }
+
+/* تزيين الهيدر بالزهور */
+.header-decoration {
+    position: absolute; left: 25px;
+    color: var(--primary);
+    font-size: 20px;
+    opacity: 0.6;
 }
 
-.welcome-screen p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-top: 10px;
+/* ==================== حاوية الرسائل ==================== */
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background-image: linear-gradient(to bottom, #fff, var(--bg-main));
 }
 
-/* فقاعات الرسائل */
+.welcome-screen { text-align: center; margin: auto; max-width: 450px; }
+.welcome-icon { font-size: 60px; display: block; margin-bottom: 20px; }
+.glow-heart { animation: glow 2s infinite; text-shadow: 0 0 10px rgba(248, 113, 113, 0.7); }
+@keyframes glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+.welcome-screen h3 { color: #b91c1c; margin-bottom: 10px; }
+.welcome-screen p { color: var(--text-muted); font-size: 15px; }
+
+/* فقاعات الرسائل الرومانسية */
 .message-bubble {
     max-width: 75%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 15px;
+    padding: 14px 18px;
+    border-radius: 20px;
+    font-size: 16px;
     line-height: 1.5;
     word-break: break-word;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: relative;
+    transition: all 0.3s;
+}
+
+/* تأثير التوهج للرسائل */
+.message-bubble.user:hover, .message-bubble.bot:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .message-bubble.user {
     align-self: flex-start;
     background-color: var(--user-bubble);
-    color: #11111b;
-    border-top-right-radius: 2px;
+    color: #991b1b;
+    border-top-right-radius: 4px; /* زاوية حادة بسيطة */
 }
 
 .message-bubble.bot {
     align-self: flex-end;
     background-color: var(--bot-bubble);
-    color: var(--text-main);
-    border-top-left-radius: 2px;
+    color: #5b21b6;
+    border-top-left-radius: 4px;
 }
 
-/* صندوق الكتابة السفلي */
+/* ==================== صندوق الكتابة السفلي (المزين) ==================== */
 .chat-footer {
-    padding: 20px;
-    background-color: var(--chat-bg);
+    padding: 25px;
+    background-color: transparent; /* عشان تبان الخلفية */
 }
 
 .input-form {
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto;
     display: flex;
     background-color: var(--input-bg);
-    border-radius: 10px;
-    padding: 5px 10px;
+    border-radius: 30px; /* شكل منحني (Pill) */
+    padding: 8px 15px;
     align-items: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border: 2px solid var(--border-color);
 }
 
 .input-form input {
     flex: 1;
     background: none;
     border: none;
-    padding: 12px;
+    padding: 14px;
     color: var(--text-main);
-    font-size: 15px;
+    font-size: 16px;
 }
 
-.input-form input:focus {
-    outline: none;
-}
+.input-form input:focus { outline: none; }
 
 .input-form button {
     background: none;
     border: none;
     color: var(--primary);
-    font-size: 18px;
+    font-size: 22px;
     cursor: pointer;
     padding: 10px;
-    transition: transform 0.1s;
+    transition: transform 0.1s, color 0.2s;
 }
 
-.input-form button:active {
-    transform: scale(0.9);
-}
+.input-form button:hover { color: #fca5a5; }
+.input-form button:active { transform: scale(0.9); }
 
-/* طبقة حماية للجوال */
+/* ==================== طبقة حماية للجوال ==================== */
 .sidebar-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(107, 33, 168, 0.2); /* بنفجسي شفاف */
     z-index: 98;
     display: none;
+    backdrop-filter: blur(3px); /* تأثير ضبابي */
 }
 
 /* ==================== استعلامات الشاشات (Responsiveness) ==================== */
 
 @media (max-width: 768px) {
-    .toggle-sidebar-btn {
-        display: block; /* تظهر أيقونة فتح القائمة */
-    }
+    .toggle-sidebar-btn { display: block; }
 
     .sidebar {
         position: fixed;
-        right: 0; /* لأن المتصفح RTL */
-        top: 0;
-        bottom: 0;
+        right: 0; top: 0; bottom: 0;
         transform: translateX(100%); /* إخفاء خارج الشاشة يميناً */
     }
 
-    .sidebar.active {
-        transform: translateX(0); /* إظهار القائمة */
-    }
+    .sidebar.active { transform: translateX(0); }
 
-    .sidebar.active ~ .sidebar-overlay {
-        display: block;
-    }
+    .sidebar.active ~ .sidebar-overlay { display: block; }
 
-    .message-bubble {
-        max-width: 85%; /* زيادة عرض الفقاعة لتناسب الشاشات الصغيرة */
-    }
+    .messages-container { padding: 15px; }
+    .message-bubble { max-width: 85%; font-size: 15px; }
+
+    .chat-header { height: 60px; padding: 0 15px; }
+    .bot-avatar-img { width: 35px; height: 35px; }
 }
