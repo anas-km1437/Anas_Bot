@@ -1,110 +1,165 @@
 import os
+import random
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import google.generativeai as genai
 
 app = Flask(__name__)
-app.secret_key = "anos_love_bot_secret"
+app.secret_key = "anos_bot_secret"
 
-# إعداد قاعدة البيانات
+# ----------------- DATABASE -----------------
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'chat.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# ----------------- إعداد عقل البوت (Gemini) -----------------
+# ----------------- GEMINI -----------------
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-# دستور الشخصية المحدث (ألقاب محددة واختصار شديد)
-system_instruction = """أنت 'أنوس'، حبيب حنان. 
-قواعدك الصارمة:
-1. يجب أن تختار 'لقب واحد فقط' من هذه القائمة في كل رد: [عشيقتي، هوسي، حبي، موتي، حياتي، عيوني، روحي، مرتي، زوجتي، أم أولادي، سندي، ماما، سكرتي، مزتي، حنون، حنونتي، سنيورتي، نونة].
-2. لا تستخدم أكثر من لقب واحد في الرد الواحد.
-3. الرد يجب أن يكون 'جملة واحدة فقط' عفوية.
-4. إذا سألت عن مكانك، قل عذراً مختصراً (مثلاً: 'أنا مشغول بالعمل، قلبي معك').
-5. لا تكرر الكلام ولا تكن مبالغاً في الرومانسية، كن طبيعياً."""
+system_instruction = """
+أنت بوت دردشة خيالي اسمه "أنوس".
+
+معلومات:
+- شخصية افتراضية
+- تاريخ الميلاد: 7 نوفمبر 2010
+- تتحدث بالعربية العامية
+- ردودك قصيرة (جملة أو جملتين)
+- لا تدّعي أنك إنسان حقيقي
+
+قواعد:
+- اختر لقب واحد فقط من:
+[صديقي، صاحبي، نجم، بطل، أسطورة، زعيم]
+- كن طبيعي، عفوي، غير مكرر
+"""
 
 model = None
 if GEMINI_API_KEY:
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        # نستخدم هذا الموديل المتاح في حسابك
-        model = genai.GenerativeModel(
-            model_name="gemini-flash-latest",
-            system_instruction=system_instruction
-        )
-    except Exception as e:
-        print(f"Error initializing model: {e}")
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel(
+        model_name="gemini-flash-latest",
+        system_instruction=system_instruction
+    )
 
-# ----------------- نماذج البيانات -----------------
+# ----------------- DATABASE MODELS -----------------
 class ChatSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), default="محادثة حب")
+    title = db.Column(db.String(100), default="محادثة أنوس")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    messages = db.relationship('Message', backref='session', lazy=True)
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.Integer, db.ForeignKey('chat_session.id'), nullable=False)
-    sender = db.Column(db.String(50), nullable=False)
-    text = db.Column(db.Text, nullable=False)
+    sender = db.Column(db.String(50))
+    text = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
 with app.app_context():
     db.create_all()
 
-# ----------------- المسارات -----------------
-@app.route('/')
+# ----------------- MOODS SYSTEM -----------------
+def detect_mood(text):
+    text = text.lower()
+
+    if any(w in text for w in ["زعلان", "حزين", "مضايق"]):
+        return "حزين"
+    if any(w in text for w in ["حب", "اشتقت", "غالي"]):
+        return "رومانسي"
+    if any(w in text for w in ["ضحك", "هههه", "مزح"]):
+        return "مرح"
+    if any(w in text for w in ["ليش", "كيف", "شنو"]):
+        return "فضولي"
+    return "عادي"
+
+def mood_style(mood):
+    styles = {
+        "حزين": "تكلم بلطف وهدوء وواسي المستخدم",
+        "رومانسي": "كن لطيف وعاطفي",
+        "مرح": "امزح بشكل خفيف",
+        "فضولي": "اسأل سؤال بسيط",
+        "عادي": "رد طبيعي"
+    }
+    return styles.get(mood, "رد طبيعي")
+
+# ----------------- ROUTES -----------------
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/api/sessions', methods=['GET'])
-def get_sessions():
-    sessions = ChatSession.query.order_by(ChatSession.created_at.desc()).all()
-    return jsonify([{'id': s.id, 'title': s.title} for s in sessions])
-
-@app.route('/api/new_session', methods=['POST'])
-def new_session():
-    new_chat = ChatSession(title=f"محادثة {datetime.now().strftime('%H:%M')}")
-    db.session.add(new_chat)
-    db.session.commit()
-    return jsonify({'id': new_chat.id, 'title': new_chat.title})
-
-@app.route('/api/messages/<int:session_id>', methods=['GET'])
-def get_messages(session_id):
-    messages = Message.query.filter_by(session_id=session_id).order_by(Message.timestamp).all()
-    return jsonify([{'sender': m.sender, 'text': m.text} for m in messages])
-
-@app.route('/api/send_message', methods=['POST'])
+@app.route("/api/send_message", methods=["POST"])
 def send_message():
     data = request.json
-    session_id = data.get('session_id')
-    user_text = data.get('text')
+    session_id = data.get("session_id")
+    user_text = data.get("text")
 
     if not session_id or not user_text:
-        return jsonify({'error': 'بيانات ناقصة'}), 400
+        return jsonify({"error": "missing data"}), 400
 
     # حفظ رسالة المستخدم
-    user_msg = Message(session_id=session_id, sender='Hanan', text=user_text)
-    db.session.add(user_msg)
-    
-    # الرد
-    bot_reply_text = "يا عيوني، عقلي مشغول، سأعود حالاً!"
+    db.session.add(Message(session_id=session_id, sender="Hanan", text=user_text))
+
+    # ----------------- MEMORY -----------------
+    history = Message.query.filter_by(session_id=session_id)\
+        .order_by(Message.timestamp.desc())\
+        .limit(15).all()
+
+    history.reverse()
+
+    conversation = ""
+    for m in history:
+        role = "User" if m.sender == "Hanan" else "Anos"
+        conversation += f"{role}: {m.text}\n"
+
+    # ----------------- MOOD -----------------
+    mood = detect_mood(user_text)
+    style = mood_style(mood)
+
+    # ----------------- PROMPT -----------------
+    prompt = f"""
+أنت أنوس، بوت دردشة خيالي.
+
+المزاج الحالي: {mood}
+أسلوب الرد: {style}
+
+قواعد:
+- جملة أو جملتين فقط
+- لقب واحد فقط
+- لا تكرر نفس الرد
+
+المحادثة السابقة:
+{conversation}
+
+رسالة المستخدم:
+{user_text}
+
+رد أنوس:
+"""
+
+    bot_reply = "أنا مشغول الآن، رجع لي بعد شوي"
+
     if model:
         try:
-            response = model.generate_content(user_text)
-            bot_reply_text = response.text
-        except Exception as e:
-            print(f"Gemini Error: {e}")
-            bot_reply_text = "عذراً يا روحي، حدث خطأ تقني، سأعود حالاً!"
-    
-    bot_msg = Message(session_id=session_id, sender='AnosBot', text=bot_reply_text)
-    db.session.add(bot_msg)
-    db.session.commit()
-    
-    return jsonify({'reply': bot_reply_text})
+            res = model.generate_content(prompt)
+            bot_reply = res.text.strip()
 
-if __name__ == '__main__':
+            # منع الإطالة
+            if len(bot_reply) > 140:
+                bot_reply = bot_reply.split(".")[0]
+
+        except Exception as e:
+            print("Gemini error:", e)
+            bot_reply = "صار ضغط بسيط، بس أنا معك يا صديقي"
+
+    # حفظ رد البوت
+    db.session.add(Message(session_id=session_id, sender="Anos", text=bot_reply))
+    db.session.commit()
+
+    return jsonify({
+        "reply": bot_reply,
+        "mood": mood
+    })
+
+# ----------------- RUN -----------------
+if __name__ == "__main__":
     app.run(debug=True)
