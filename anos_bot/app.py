@@ -38,9 +38,15 @@ model = None
 if GEMINI_API_KEY:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        # نستخدم gemini-1.5-flash كخيار أول، إذا لم يعمل قد نحتاج للتغيير لـ gemini-pro
+        
+        # 1. كود الفحص (سيطبع الموديلات المتاحة في الـ Logs)
+        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        print(f"Available models: {available_models}")
+        
+        # 2. حاول استخدام 'gemini-1.0-pro' فهو الأكثر استقراراً في الحسابات القديمة
+        # إذا لم يعمل، سنغيره بناءً على ما سيظهر في الـ Logs
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-1.0-pro",
             system_instruction=system_instruction
         )
     except Exception as e:
