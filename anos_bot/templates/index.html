@@ -3,71 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anos Bot | أنوس </title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>محادثة أنوس</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
-    <div class="romantic-background">
-        <div class="heart h1">❤️</div>
-        <div class="heart h2">💖</div>
-        <div class="heart h3">💗</div>
-        <div class="heart h4">💓</div>
-        <div class="heart h5">💕</div>
-        <div class="heart h6">❤️</div>
-    </div>
-
     <div class="app-container">
-        
-        <aside class="sidebar" id="sidebar">
-            <button class="new-chat-btn pulse-button" id="newChatBtn">
-                <i class="fa-heart fa-solid"></i> محادثة حب جديدة
-            </button>
-            <div class="sessions-list" id="sessionsList">
-                </div>
-        </aside>
+        <!-- القائمة الجانبية للمحادثات -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-heart"></i> ذكرياتنا</h2>
+                <button id="new-chat-btn"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <ul id="sessions-list"></ul>
+        </div>
 
-        <main class="chat-main">
-            <header class="chat-header">
-                <button class="toggle-sidebar-btn" id="toggleSidebar">
-                    <i class="fa-bars fa-solid"></i>
-                </button>
-                <div class="bot-info">
-                    <div class="avatar-wrapper">
-                        <img src="{{ url_for('static', filename='bot_avatar.png') }}" alt="Anos Bot" class="bot-avatar-img" onerror="this.src='https://placehold.co/100x100/fbcfe8/6b21a8?text=Anos'">
-                        <div class="bot-sparkle"></div>
-                    </div>
-                    <div>
-                        <h2>Anos Bot</h2>
-                        <small>بانتظاركِ دائماً</small>
-                    </div>
+        <!-- منطقة الدردشة الرئيسية -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <div class="avatar-container">
+                    <!-- يمكنك وضع صورة لك هنا في مجلد static باسم avatar.png -->
+                    <img src="{{ url_for('static', filename='bot_avatar.png') }}" alt="أنوس" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                    <div class="online-dot"></div>
                 </div>
-                <div class="header-decoration">
-                    <i class="fa-spa fa-solid floral-icon"></i>
+                <div class="header-info">
+                    <h3>أنوس <span>حبيب قلبي</span></h3>
+                    <p>متصل الآن</p>
                 </div>
-            </header>
+            </div>
 
-            <section class="messages-container" id="messagesContainer">
-                <div class="welcome-screen" id="welcomeScreen">
-                    <span class="welcome-icon glow-heart">❤️</span>
-                    <h3>مرحباً بكِ في عالمنا الخاص</h3>
-                    <p>ابدئي محادثة جديدة أو اختاري من الأرشيف وسأكون هنا لأجلكِ.</p>
-                </div>
-            </section>
+            <div class="chat-messages" id="chat-messages">
+                <!-- الرسائل ستظهر هنا -->
+            </div>
 
-            <footer class="chat-footer">
-                <form class="input-form" id="chatForm">
-                    <input type="text" id="userInput" placeholder="اكتبي ما في قلبكِ..." autocomplete="off" required>
-                    <button type="submit" id="sendBtn" class="send-button">
-                        <i class="fa-heart fa-solid input-heart"></i>
-                    </button>
-                </form>
-            </footer>
-        </main>
+            <div class="chat-input-container">
+                <input type="text" id="user-input" placeholder="اكتبي لـ أنوس هنا يا روحي..." autocomplete="off">
+                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
-
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
