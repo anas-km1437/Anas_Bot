@@ -1,132 +1,123 @@
-let currentSessionId = null;
+document.addEventListener("DOMContentLoaded", () => {
+    let currentSessionId = null;
+    const sessionsList = document.getElementById("sessions-list");
+    const chatMessages = document.getElementById("chat-messages");
+    const userInput = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    const newChatBtn = document.getElementById("new-chat-btn");
 
-// عناصر الواجهة الأساسية
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
-const sessionsList = document.getElementById('sessionsList');
-const newChatBtn = document.getElementById('newChatBtn');
-const messagesContainer = document.getElementById('messagesContainer');
-const welcomeScreen = document.getElementById('welcomeScreen');
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
+    // إنشاء عنصر مؤشر الكتابة (النقاط الثلاث) وإضافته مؤقتاً
+    const typingIndicator = document.createElement("div");
+    typingIndicator.className = "typing-indicator";
+    typingIndicator.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
 
-// التحكم في فتح وإغلاق المنيو في الجوال
-toggleSidebar.addEventListener('click', () => sidebar.classList.toggle('active'));
-sidebarOverlay.addEventListener('click', () => sidebar.classList.remove('active'));
-
-// جلب كل المحادثات عند فتح الموقع أول مرة
-async function loadSessions() {
-    try {
-        const response = await fetch('/api/sessions');
-        const sessions = await response.json();
-        sessionsList.innerHTML = '';
-        
-        sessions.forEach(session => {
-            const div = document.createElement('div');
-            div.className = `session-item ${currentSessionId === session.id ? 'active' : ''}`;
-            div.textContent = session.title;
-            div.addEventListener('click', () => {
-                selectSession(session.id);
-                sidebar.classList.remove('active'); // إغلاق السايدبار بالجوال بعد الاختيار
+    // تحميل الجلسات
+    function loadSessions() {
+        fetch("/api/sessions")
+            .then(res => res.json())
+            .then(sessions => {
+                sessionsList.innerHTML = "";
+                sessions.forEach(session => {
+                    const li = document.createElement("li");
+                    li.textContent = session.title;
+                    li.onclick = () => loadMessages(session.id, li);
+                    sessionsList.appendChild(li);
+                });
+                if (sessions.length > 0 && !currentSessionId) {
+                    loadMessages(sessions[0].id, sessionsList.firstChild);
+                }
             });
-            sessionsList.appendChild(div);
-        });
-    } catch (err) {
-        console.error("فشل في جلب المحادثات:", err);
     }
-}
 
-// إنشاء محادثة جديدة
-newChatBtn.addEventListener('click', async () => {
-    try {
-        const response = await fetch('/api/new_session', { method: 'POST' });
-        const newSession = await response.json();
-        currentSessionId = newSession.id;
-        await loadSessions();
-        selectSession(newSession.id);
-    } catch (err) {
-        console.error("فشل في إنشاء محادثة جديدة:", err);
+    // إنشاء محادثة جديدة
+    newChatBtn.onclick = () => {
+        fetch("/api/new_session", { method: "POST" })
+            .then(res => res.json())
+            .then(data => {
+                currentSessionId = data.id;
+                chatMessages.innerHTML = "";
+                loadSessions();
+            });
+    };
+
+    // تحميل رسائل الجلسة
+    function loadMessages(sessionId, liElement) {
+        currentSessionId = sessionId;
+        document.querySelectorAll("#sessions-list li").forEach(li => li.classList.remove("active"));
+        if(liElement) liElement.classList.add("active");
+
+        fetch(`/api/messages/${sessionId}`)
+            .then(res => res.json())
+            .then(messages => {
+                chatMessages.innerHTML = "";
+                messages.forEach(msg => {
+                    appendMessage(msg.sender, msg.text);
+                });
+                scrollToBottom();
+            });
     }
-});
 
-// اختيار محادثة معينة وعرض رسائلها
-async function selectSession(sessionId) {
-    currentSessionId = sessionId;
-    
-    // تحديث الحالة النشطة في القائمة الجانبية
-    document.querySelectorAll('.session-item').forEach(item => item.classList.remove('active'));
-    loadSessions(); // لتحديث الكلاس النشط
-
-    if (welcomeScreen) welcomeScreen.style.display = 'none';
-    messagesContainer.innerHTML = ''; // تنظيف الشاشة للرسائل الجديدة
-
-    try {
-        const response = await fetch(`/api/messages/${sessionId}`);
-        const messages = await response.json();
-        
-        messages.forEach(msg => {
-            appendMessage(msg.sender === 'Hanan' ? 'user' : 'bot', msg.text);
-        });
+    // إضافة الرسالة للواجهة
+    function appendMessage(sender, text) {
+        const div = document.createElement("div");
+        div.className = `msg-bubble ${sender === 'Hanan' ? 'msg-user' : 'msg-bot'}`;
+        div.textContent = text;
+        chatMessages.appendChild(div);
         scrollToBottom();
-    } catch (err) {
-        console.error("فشل في جلب الرسائل:", err);
-    }
-}
-
-// إضافة فقاعة رسالة داخل صندوق الشات
-function appendMessage(sender, text) {
-    if (welcomeScreen) welcomeScreen.style.display = 'none';
-    const bubble = document.createElement('div');
-    bubble.className = `message-bubble ${sender}`;
-    bubble.textContent = text;
-    messagesContainer.appendChild(bubble);
-    scrollToBottom();
-}
-
-// النزول التلقائي لأسفل الشات مع كل رسالة جديدة
-function scrollToBottom() {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// إرسال الرسالة عبر الفورم
-chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = userInput.value.trim();
-    if (!text) return;
-
-    // إذا لم تكن هناك محادثة مفتوحة، ننشئ واحدة تلقائياً أولاً
-    if (!currentSessionId) {
-        try {
-            const response = await fetch('/api/new_session', { method: 'POST' });
-            const newSession = await response.json();
-            currentSessionId = newSession.id;
-            await loadSessions();
-        } catch (err) {
-            console.error(err);
-            return;
-        }
     }
 
-    // عرض رسالة المستخدم فوراً
-    appendMessage('user', text);
-    userInput.value = '';
+    // إظهار النقاط الثلاث
+    function showTyping() {
+        chatMessages.appendChild(typingIndicator);
+        typingIndicator.style.display = "flex";
+        scrollToBottom();
+    }
 
-    try {
-        const response = await fetch('/api/send_message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: currentSessionId, text: text })
-        });
-        const data = await response.json();
+    // إخفاء النقاط الثلاث
+    function hideTyping() {
+        typingIndicator.style.display = "none";
+    }
+
+    // النزول لأسفل المحادثة
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // إرسال الرسالة
+    function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text || !currentSessionId) return;
+
+        // إظهار رسالة المستخدم
+        appendMessage("Hanan", text);
+        userInput.value = "";
         
-        // عرض رد البوت
-        appendMessage('bot', data.reply);
-    } catch (err) {
-        console.error("خطأ أثناء إرسال الرسالة:", err);
-        appendMessage('bot', "حدث خطأ ما في الاتصال بالسيرفر.");
-    }
-});
+        // إظهار أن البوت يكتب...
+        showTyping();
 
-// تشغيل جلب المحادثات بمجرد تحميل الصفحة
-window.addEventListener('DOMContentLoaded', loadSessions);
+        fetch("/api/send_message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: currentSessionId, text: text })
+        })
+        .then(res => res.json())
+        .then(data => {
+            hideTyping(); // إخفاء النقاط بعد وصول الرد
+            if (data.reply) {
+                appendMessage("AnosBot", data.reply);
+            }
+        })
+        .catch(err => {
+            hideTyping();
+            appendMessage("AnosBot", "يا روحي الشبكة فيها شوية ضغط، دقيقة بس!");
+            console.error(err);
+        });
+    }
+
+    sendBtn.onclick = sendMessage;
+    userInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
+
+    loadSessions();
+});
