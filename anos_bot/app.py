@@ -38,15 +38,9 @@ model = None
 if GEMINI_API_KEY:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        
-        # 1. كود الفحص (سيطبع الموديلات المتاحة في الـ Logs)
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        print(f"Available models: {available_models}")
-        
-        # 2. حاول استخدام 'gemini-1.0-pro' فهو الأكثر استقراراً في الحسابات القديمة
-        # إذا لم يعمل، سنغيره بناءً على ما سيظهر في الـ Logs
+        # تم اختيار gemini-2.0-flash لأنه متاح في قائمة حسابك الرسمية
         model = genai.GenerativeModel(
-            model_name="gemini-1.0-pro",
+            model_name="gemini-2.0-flash",
             system_instruction=system_instruction
         )
     except Exception as e:
@@ -112,6 +106,7 @@ def send_message():
             bot_reply_text = response.text
         except Exception as e:
             print(f"Gemini Error: {e}")
+            bot_reply_text = "عذراً يا روحي، حدث خطأ تقني صغير، سأعود حالاً!"
     
     bot_msg = Message(session_id=session_id, sender='AnosBot', text=bot_reply_text)
     db.session.add(bot_msg)
