@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>محادثة أنوس</title>
+    <title>محادثة أنوس وحنان</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- مكتبة تحميل المحادثة كصورة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- القائمة الجانبية للمحادثات -->
+    <div class="app-container" id="capture-area">
+        <!-- القائمة الجانبية -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fa-solid fa-heart"></i> ذكرياتنا</h2>
-                <button id="new-chat-btn"><i class="fa-solid fa-plus"></i></button>
+                <button id="new-chat-btn" title="محادثة جديدة"><i class="fa-solid fa-plus"></i></button>
             </div>
             <ul id="sessions-list"></ul>
         </div>
@@ -22,18 +24,22 @@
         <div class="chat-area">
             <div class="chat-header">
                 <div class="avatar-container">
-                    <!-- يمكنك وضع صورة لك هنا في مجلد static باسم avatar.png -->
-                    <img src="{{ url_for('static', filename='bot_avatar.png') }}" alt="أنوس" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="أنوس">
                     <div class="online-dot"></div>
                 </div>
                 <div class="header-info">
                     <h3>أنوس <span>حبيب قلبي</span></h3>
-                    <p>متصل الآن</p>
+                    <p>متصل الآن ويكتب لكِ بحب...</p>
+                </div>
+                <!-- أزرار الإضافات الجديدة -->
+                <div class="header-actions">
+                    <button id="theme-btn" title="الوضع الليلي"><i class="fa-solid fa-moon"></i></button>
+                    <button id="download-btn" title="حفظ المحادثة"><i class="fa-solid fa-download"></i></button>
                 </div>
             </div>
 
             <div class="chat-messages" id="chat-messages">
-                <!-- الرسائل ستظهر هنا -->
+                <!-- الرسائل -->
             </div>
 
             <div class="chat-input-container">
