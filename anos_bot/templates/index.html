@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anos Bot | عالم أنوس </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_with_fallback('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -35,7 +35,7 @@
                 </button>
                 <div class="bot-info">
                     <div class="avatar-wrapper">
-                        <img src="{{ url_with_fallback('static', filename='bot_avatar.png') }}" alt="Anos Bot" class="bot-avatar-img">
+                        <img src="{{ url_for('static', filename='bot_avatar.png') }}" alt="Anos Bot" class="bot-avatar-img" onerror="this.src='https://placehold.co/100x100/fbcfe8/6b21a8?text=Anos'">
                         <div class="bot-sparkle"></div>
                     </div>
                     <div>
@@ -51,7 +51,7 @@
             <section class="messages-container" id="messagesContainer">
                 <div class="welcome-screen" id="welcomeScreen">
                     <span class="welcome-icon glow-heart">❤️</span>
-                    <h3>مرحباً بكِ في عالمنا</h3>
+                    <h3>مرحباً بكِ في عالمنا الخاص</h3>
                     <p>ابدئي محادثة جديدة أو اختاري من الأرشيف وسأكون هنا لأجلكِ.</p>
                 </div>
             </section>
@@ -69,6 +69,6 @@
 
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <script src="{{ url_with_fallback('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
