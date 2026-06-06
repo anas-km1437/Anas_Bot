@@ -1,13 +1,15 @@
 import os
 import random
 import re
-from flask import Flask, render_template, request, jsonify
+from functools import wraps
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import google.generativeai as genai
 
 app = Flask(__name__)
-app.secret_key = "anos_love_bot_secret_pro"
+# المفتاح السري مهم جداً لتشفير جلسة تسجيل الدخول
+app.secret_key = "anos_love_bot_secret_pro_v3"
 
 # ----------------- قاعدة البيانات -----------------
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -89,17 +91,47 @@ def apply_post_processing(text, nickname):
         short_reply += f" يا {nickname}."
     return short_reply
 
+# ----------------- حماية المسارات (Login Decorator) -----------------
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            if request.path.startswith('/api/'):
+                return jsonify({"error": "Unauthorized"}), 401
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 # ----------------- Routes -----------------
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        if request.form.get("password") == "خنساء":
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            error = "كلمة السر غير صحيحة يا روحي، حاولي مرة ثانية!"
+    return render_template("login.html", error=error)
+
+@app.route("/logout")
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 @app.route("/")
+@login_required
 def index(): 
     return render_template("index.html")
 
 @app.route("/api/sessions", methods=["GET"])
+@login_required
 def get_sessions():
     sessions = ChatSession.query.order_by(ChatSession.created_at.desc()).all()
     return jsonify([{"id": s.id, "title": s.title} for s in sessions])
 
 @app.route("/api/new_session", methods=["POST"])
+@login_required
 def new_session():
     new_chat = ChatSession(title=f"محادثة {datetime.now().strftime('%H:%M')}")
     db.session.add(new_chat)
@@ -107,20 +139,23 @@ def new_session():
     return jsonify({"id": new_chat.id, "title": new_chat.title})
 
 @app.route("/api/sessions/<int:session_id>", methods=["DELETE"])
+@login_required
 def delete_session(session_id):
-    session = db.session.get(ChatSession, session_id)
-    if not session: return jsonify({"error": "الجلسة غير موجودة"}), 404
+    session_obj = db.session.get(ChatSession, session_id)
+    if not session_obj: return jsonify({"error": "الجلسة غير موجودة"}), 404
     Message.query.filter_by(session_id=session_id).delete()
-    db.session.delete(session)
+    db.session.delete(session_obj)
     db.session.commit()
     return jsonify({"success": True})
 
 @app.route("/api/messages/<int:session_id>")
+@login_required
 def messages(session_id):
     msgs = Message.query.filter_by(session_id=session_id).order_by(Message.timestamp).all()
     return jsonify([{"sender": m.sender, "text": m.text} for m in msgs])
 
 @app.route("/api/send_message", methods=["POST"])
+@login_required
 def send_message():
     data = request.json
     session_id = data.get("session_id")
