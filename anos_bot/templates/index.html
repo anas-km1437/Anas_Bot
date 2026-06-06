@@ -6,10 +6,12 @@
     <title>محادثة أنوس وحنان</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- مكتبة تحميل المحادثة كصورة -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="app-container" id="capture-area">
+        <!-- القائمة الجانبية -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fa-solid fa-heart"></i> ذكرياتنا</h2>
@@ -18,6 +20,7 @@
             <ul id="sessions-list"></ul>
         </div>
 
+        <!-- منطقة الدردشة الرئيسية -->
         <div class="chat-area">
             <div class="chat-header">
                 <div class="avatar-container">
@@ -28,6 +31,7 @@
                     <h3>أنوس <span>حبيب قلبي</span></h3>
                     <p>متصل الآن ويكتب لكِ بحب...</p>
                 </div>
+                <!-- أزرار الإضافات -->
                 <div class="header-actions">
                     <button id="theme-btn" title="الوضع الليلي"><i class="fa-solid fa-moon"></i></button>
                     <button id="download-btn" title="حفظ المحادثة"><i class="fa-solid fa-download"></i></button>
@@ -35,11 +39,28 @@
             </div>
 
             <div class="chat-messages" id="chat-messages">
-                </div>
+                <!-- الرسائل تظهر هنا ديناميكياً -->
+            </div>
 
             <div class="chat-input-container">
                 <input type="text" id="user-input" placeholder="اكتبي لـ أنوس هنا يا روحي..." autocomplete="off">
                 <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- الزر العائم لجرعة الحب -->
+    <button id="love-capsule-btn" class="floating-btn" title="خذي جرعة حب"><i class="fa-solid fa-capsules"></i></button>
+
+    <!-- الشاشة المنبثقة لجرعة الحب (Modal) -->
+    <div id="capsule-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <h2>💊 جرعة حب من أنوس</h2>
+            <div class="capsule-body">
+                <i class="fa-solid fa-quote-right quote-icon"></i>
+                <p id="capsule-text"></p>
+                <i class="fa-solid fa-quote-left quote-icon"></i>
             </div>
         </div>
     </div>
