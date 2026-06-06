@@ -8,13 +8,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.getElementById("download-btn");
     const newChatBtn = document.getElementById("new-chat-btn");
 
+    // عناصر الموبايل
+    const sidebar = document.getElementById("sidebar");
+    const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+    const closeSidebarBtn = document.getElementById("close-sidebar-btn");
+    const sidebarOverlay = document.getElementById("sidebar-overlay");
+
     // عناصر جرعة الحب
     const capsuleBtn = document.getElementById("love-capsule-btn");
     const capsuleModal = document.getElementById("capsule-modal");
     const closeModal = document.getElementById("close-modal");
     const capsuleText = document.getElementById("capsule-text");
 
-    // رسائل جرعة الحب الخاصة بك
     const myLoveMessages = [
         "أنتِ النور اللي ضوّى حياتي، وكل يوم معك هو أحلى يوم بعمري.",
         "لو جمعت كل كلمات الحب بالدنيا، ما توفي حق عيونك الحلوين.",
@@ -27,6 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
         "أنا محظوظ جداً لأنك بحياتي، بحبك يا أغلى ما أملك.",
         "وجودك بيكفيني عن كل العالم، أنتِ عالمي كله."
     ];
+
+    // منطق فتح وإغلاق القائمة الجانبية للموبايل
+    function toggleSidebar(show) {
+        if (show) {
+            sidebar.classList.add("open");
+            sidebarOverlay.classList.add("show");
+        } else {
+            sidebar.classList.remove("open");
+            sidebarOverlay.classList.remove("show");
+        }
+    }
+
+    mobileMenuBtn.onclick = () => toggleSidebar(true);
+    closeSidebarBtn.onclick = () => toggleSidebar(false);
+    sidebarOverlay.onclick = () => toggleSidebar(false);
 
     // إدارة الوضع الليلي
     const isDark = localStorage.getItem("darkMode") === "true";
@@ -42,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
         themeBtn.innerHTML = darkModeEnabled ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
     };
 
-    // تصدير الشات كصورة PNG
     downloadBtn.onclick = () => {
         html2canvas(chatMessages, { scale: 2, backgroundColor: null }).then(canvas => {
             const link = document.createElement('a');
@@ -52,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // تأثير تساقط القلوب السحري
     function triggerHearts(force = false, text = "") {
         const keywords = ["بحبك", "بموت فيك", "عشقي", "حبيبي", "شوق", "قلبي", "اشتقتلك"];
         if (force || keywords.some(word => text.includes(word))) {
@@ -69,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // فتح شاشة جرعة الحب
     capsuleBtn.onclick = () => {
         const randomMsg = myLoveMessages[Math.floor(Math.random() * myLoveMessages.length)];
         capsuleText.textContent = randomMsg;
@@ -77,13 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
         triggerHearts(true);
     };
 
-    // إغلاق شاشة جرعة الحب
     closeModal.onclick = () => capsuleModal.classList.remove("show");
     capsuleModal.onclick = (e) => {
         if (e.target === capsuleModal) capsuleModal.classList.remove("show");
     };
 
-    // جلب الجلسات والمحادثات
     function loadSessions() {
         fetch("/api/sessions")
             .then(res => res.json())
@@ -94,12 +109,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     const titleSpan = document.createElement("span");
                     titleSpan.textContent = session.title;
-                    titleSpan.onclick = () => loadMessages(session.id, li);
+                    titleSpan.onclick = () => {
+                        loadMessages(session.id, li);
+                        // إغلاق القائمة تلقائياً في الهاتف عند اختيار محادثة
+                        if (window.innerWidth <= 768) toggleSidebar(false);
+                    };
                     
                     const deleteBtn = document.createElement("button");
                     deleteBtn.className = "delete-btn";
                     deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-                    deleteBtn.title = "حذف هذه الذكرى";
                     deleteBtn.onclick = (e) => {
                         e.stopPropagation();
                         if (confirm("متأكدة بدك تمسحي هالمحادثة يا روحي؟ 🥺")) {
@@ -132,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 currentSessionId = data.id;
                 chatMessages.innerHTML = "";
                 loadSessions();
+                if (window.innerWidth <= 768) toggleSidebar(false);
             });
     };
 
@@ -172,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!text) return;
         
         if (!currentSessionId) {
-            alert("الرجاء إنشاء محادثة جديدة أولاً أو اختيار محادثة نشطة من القائمة الجانبية.");
+            alert("الرجاء إنشاء محادثة جديدة أولاً.");
             return;
         }
 
@@ -203,7 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const indicator = document.getElementById(typingId);
             if (indicator) indicator.remove();
             appendMessage("AnosBot", "يا روحي السيرفر مضغوط شوية، ثواني وعيدي الإرسال!");
-            console.error(err);
         });
     }
 
