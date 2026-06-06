@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeModal = document.getElementById("close-modal");
     const capsuleText = document.getElementById("capsule-text");
 
-    // رسائل جرعة الحب (أضف وعدّل كما تريد هنا)
+    // رسائل جرعة الحب الخاصة بك
     const myLoveMessages = [
         "أنتِ النور اللي ضوّى حياتي، وكل يوم معك هو أحلى يوم بعمري.",
         "لو جمعت كل كلمات الحب بالدنيا، ما توفي حق عيونك الحلوين.",
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "وجودك بيكفيني عن كل العالم، أنتِ عالمي كله."
     ];
 
-    // الميزة 4: إدارة الوضع الليلي
+    // إدارة الوضع الليلي
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
         document.body.classList.add("dark-mode");
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
         themeBtn.innerHTML = darkModeEnabled ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
     };
 
-    // الميزة 5: تصدير الشات كـصورة PNG
+    // تصدير الشات كصورة PNG
     downloadBtn.onclick = () => {
         html2canvas(chatMessages, { scale: 2, backgroundColor: null }).then(canvas => {
             const link = document.createElement('a');
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const randomMsg = myLoveMessages[Math.floor(Math.random() * myLoveMessages.length)];
         capsuleText.textContent = randomMsg;
         capsuleModal.classList.add("show");
-        triggerHearts(true); // تشغيل القلوب إجبارياً عند فتح الجرعة
+        triggerHearts(true);
     };
 
     // إغلاق شاشة جرعة الحب
@@ -83,16 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === capsuleModal) capsuleModal.classList.remove("show");
     };
 
-    // ميزة القراءة الصوتية
-    function speakText(text) {
-        window.speechSynthesis.cancel();
-        const speech = new SpeechSynthesisUtterance(text);
-        speech.lang = 'ar-SA';
-        speech.rate = 0.95;
-        window.speechSynthesis.speak(speech);
-    }
-
-    // إدارة الجلسات
+    // جلب الجلسات والمحادثات
     function loadSessions() {
         fetch("/api/sessions")
             .then(res => res.json())
@@ -154,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(messages => {
                 chatMessages.innerHTML = "";
                 messages.forEach(msg => appendMessage(msg.sender, msg.text));
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                scrollToBottom();
             });
     }
 
@@ -165,17 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const textSpan = document.createElement("span");
         textSpan.textContent = text;
         div.appendChild(textSpan);
-        
-        if (sender !== 'Hanan') {
-            const ttsBtn = document.createElement("button");
-            ttsBtn.className = "tts-btn";
-            ttsBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> اسمعي صوتي';
-            ttsBtn.onclick = () => speakText(text);
-            div.appendChild(ttsBtn);
-        }
 
         chatMessages.appendChild(div);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 50);
     }
 
     function sendMessage() {
@@ -194,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const typingId = "typing-" + Date.now();
         const typingHTML = `<div class="typing-indicator" id="${typingId}" style="display: flex;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
         chatMessages.insertAdjacentHTML('beforeend', typingHTML);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        scrollToBottom();
 
         fetch("/api/send_message", {
             method: "POST",
