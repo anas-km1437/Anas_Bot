@@ -33,7 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
         "وجودك بيكفيني عن كل العالم، أنتِ عالمي كله."
     ];
 
-    // منطق فتح وإغلاق القائمة الجانبية للموبايل
+    // دالة للتحقق من صلاحية الجلسة
+    function handleResponse(response) {
+        if (response.status === 401) {
+            window.location.href = "/login";
+            throw new Error("Unauthorized");
+        }
+        return response.json();
+    }
+
     function toggleSidebar(show) {
         if (show) {
             sidebar.classList.add("open");
@@ -44,32 +52,35 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    mobileMenuBtn.onclick = () => toggleSidebar(true);
-    closeSidebarBtn.onclick = () => toggleSidebar(false);
-    sidebarOverlay.onclick = () => toggleSidebar(false);
+    if(mobileMenuBtn) mobileMenuBtn.onclick = () => toggleSidebar(true);
+    if(closeSidebarBtn) closeSidebarBtn.onclick = () => toggleSidebar(false);
+    if(sidebarOverlay) sidebarOverlay.onclick = () => toggleSidebar(false);
 
-    // إدارة الوضع الليلي
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
         document.body.classList.add("dark-mode");
-        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+        if(themeBtn) themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
     }
     
-    themeBtn.onclick = () => {
-        document.body.classList.toggle("dark-mode");
-        const darkModeEnabled = document.body.classList.contains("dark-mode");
-        localStorage.setItem("darkMode", darkModeEnabled);
-        themeBtn.innerHTML = darkModeEnabled ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
-    };
+    if(themeBtn) {
+        themeBtn.onclick = () => {
+            document.body.classList.toggle("dark-mode");
+            const darkModeEnabled = document.body.classList.contains("dark-mode");
+            localStorage.setItem("darkMode", darkModeEnabled);
+            themeBtn.innerHTML = darkModeEnabled ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+        };
+    }
 
-    downloadBtn.onclick = () => {
-        html2canvas(chatMessages, { scale: 2, backgroundColor: null }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `ذكريات_حب_${Date.now()}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        });
-    };
+    if(downloadBtn) {
+        downloadBtn.onclick = () => {
+            html2canvas(chatMessages, { scale: 2, backgroundColor: null }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `ذكريات_حب_${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        };
+    }
 
     function triggerHearts(force = false, text = "") {
         const keywords = ["بحبك", "بموت فيك", "عشقي", "حبيبي", "شوق", "قلبي", "اشتقتلك"];
@@ -87,21 +98,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    capsuleBtn.onclick = () => {
-        const randomMsg = myLoveMessages[Math.floor(Math.random() * myLoveMessages.length)];
-        capsuleText.textContent = randomMsg;
-        capsuleModal.classList.add("show");
-        triggerHearts(true);
-    };
+    if(capsuleBtn) {
+        capsuleBtn.onclick = () => {
+            const randomMsg = myLoveMessages[Math.floor(Math.random() * myLoveMessages.length)];
+            capsuleText.textContent = randomMsg;
+            capsuleModal.classList.add("show");
+            triggerHearts(true);
+        };
+    }
 
-    closeModal.onclick = () => capsuleModal.classList.remove("show");
-    capsuleModal.onclick = (e) => {
-        if (e.target === capsuleModal) capsuleModal.classList.remove("show");
-    };
+    if(closeModal) {
+        closeModal.onclick = () => capsuleModal.classList.remove("show");
+        capsuleModal.onclick = (e) => {
+            if (e.target === capsuleModal) capsuleModal.classList.remove("show");
+        };
+    }
 
     function loadSessions() {
         fetch("/api/sessions")
-            .then(res => res.json())
+            .then(handleResponse)
             .then(sessions => {
                 sessionsList.innerHTML = "";
                 sessions.forEach((session, index) => {
@@ -111,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     titleSpan.textContent = session.title;
                     titleSpan.onclick = () => {
                         loadMessages(session.id, li);
-                        // إغلاق القائمة تلقائياً في الهاتف عند اختيار محادثة
                         if (window.innerWidth <= 768) toggleSidebar(false);
                     };
                     
@@ -122,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         e.stopPropagation();
                         if (confirm("متأكدة بدك تمسحي هالمحادثة يا روحي؟ 🥺")) {
                             fetch(`/api/sessions/${session.id}`, { method: "DELETE" })
+                                .then(handleResponse)
                                 .then(() => {
                                     if (currentSessionId === session.id) {
                                         chatMessages.innerHTML = "";
@@ -140,19 +155,23 @@ document.addEventListener("DOMContentLoaded", () => {
                         loadMessages(session.id, li);
                     }
                 });
-            });
+            })
+            .catch(err => console.log(err));
     }
 
-    newChatBtn.onclick = () => {
-        fetch("/api/new_session", { method: "POST" })
-            .then(res => res.json())
-            .then(data => {
-                currentSessionId = data.id;
-                chatMessages.innerHTML = "";
-                loadSessions();
-                if (window.innerWidth <= 768) toggleSidebar(false);
-            });
-    };
+    if(newChatBtn) {
+        newChatBtn.onclick = () => {
+            fetch("/api/new_session", { method: "POST" })
+                .then(handleResponse)
+                .then(data => {
+                    currentSessionId = data.id;
+                    chatMessages.innerHTML = "";
+                    loadSessions();
+                    if (window.innerWidth <= 768) toggleSidebar(false);
+                })
+                .catch(err => console.log(err));
+        };
+    }
 
     function loadMessages(sessionId, liElement) {
         currentSessionId = sessionId;
@@ -160,12 +179,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (liElement) liElement.classList.add("active");
 
         fetch(`/api/messages/${sessionId}`)
-            .then(res => res.json())
+            .then(handleResponse)
             .then(messages => {
                 chatMessages.innerHTML = "";
                 messages.forEach(msg => appendMessage(msg.sender, msg.text));
                 scrollToBottom();
-            });
+            })
+            .catch(err => console.log(err));
     }
 
     function appendMessage(sender, text) {
@@ -209,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ session_id: currentSessionId, text: text })
         })
-        .then(res => res.json())
+        .then(handleResponse)
         .then(data => {
             const indicator = document.getElementById(typingId);
             if (indicator) indicator.remove();
@@ -219,16 +239,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(err => {
-            const indicator = document.getElementById(typingId);
-            if (indicator) indicator.remove();
-            appendMessage("AnosBot", "يا روحي السيرفر مضغوط شوية، ثواني وعيدي الإرسال!");
+            if(err.message !== "Unauthorized") {
+                const indicator = document.getElementById(typingId);
+                if (indicator) indicator.remove();
+                appendMessage("AnosBot", "يا روحي السيرفر مضغوط شوية، ثواني وعيدي الإرسال!");
+            }
         });
     }
 
-    sendBtn.onclick = sendMessage;
-    userInput.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendMessage();
-    });
+    if(sendBtn) sendBtn.onclick = sendMessage;
+    if(userInput) {
+        userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+    }
 
-    loadSessions();
+    // تشغيل جلب الجلسات فقط إذا كنا في الصفحة الرئيسية (وليس صفحة تسجيل الدخول)
+    if(document.getElementById("sessions-list")) {
+        loadSessions();
+    }
 });
