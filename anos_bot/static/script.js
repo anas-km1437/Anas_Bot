@@ -8,7 +8,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.getElementById("download-btn");
     const newChatBtn = document.getElementById("new-chat-btn");
 
-    // الميزة 4: إدارة الوضع الليلي وثباته عند التحديث
+    // عناصر جرعة الحب
+    const capsuleBtn = document.getElementById("love-capsule-btn");
+    const capsuleModal = document.getElementById("capsule-modal");
+    const closeModal = document.getElementById("close-modal");
+    const capsuleText = document.getElementById("capsule-text");
+
+    // رسائل جرعة الحب (أضف وعدّل كما تريد هنا)
+    const myLoveMessages = [
+        "أنتِ النور اللي ضوّى حياتي، وكل يوم معك هو أحلى يوم بعمري.",
+        "لو جمعت كل كلمات الحب بالدنيا، ما توفي حق عيونك الحلوين.",
+        "ضحكتك هي الأغنية المفضلة لقلبي، لا تحرميني منها أبداً.",
+        "بحبك مش بس لأنك حبيبتي، بحبك لأنك أقرب حد لروحي وتوأمي.",
+        "وقت أكون معك، بنسى كل تعب الدنيا. أنتِ راحتي وأماني.",
+        "بتعرفي إنك أحلى صدفة بحياتي؟ يا ريتني عرفتك من زمان.",
+        "مهما بعدتنا المسافات أو الظروف، رح تضلي بقلبي ملكة متوجة.",
+        "الله يخليلي إياكي وما يحرمني من هالصوت وهالحنية.",
+        "أنا محظوظ جداً لأنك بحياتي، بحبك يا أغلى ما أملك.",
+        "وجودك بيكفيني عن كل العالم، أنتِ عالمي كله."
+    ];
+
+    // الميزة 4: إدارة الوضع الليلي
     const isDark = localStorage.getItem("darkMode") === "true";
     if (isDark) {
         document.body.classList.add("dark-mode");
@@ -22,7 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
         themeBtn.innerHTML = darkModeEnabled ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
     };
 
-    // الميزة 5: تصدير الشات كـصورة PNG للذكريات
+    // الميزة 5: تصدير الشات كـصورة PNG
     downloadBtn.onclick = () => {
         html2canvas(chatMessages, { scale: 2, backgroundColor: null }).then(canvas => {
             const link = document.createElement('a');
@@ -32,11 +52,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    // الميزة 2: تأثير تساقط القلوب السحري
-    function triggerHearts(text) {
+    // تأثير تساقط القلوب السحري
+    function triggerHearts(force = false, text = "") {
         const keywords = ["بحبك", "بموت فيك", "عشقي", "حبيبي", "شوق", "قلبي", "اشتقتلك"];
-        if (keywords.some(word => text.includes(word))) {
-            for (let i = 0; i < 25; i++) {
+        if (force || keywords.some(word => text.includes(word))) {
+            for (let i = 0; i < 30; i++) {
                 let heart = document.createElement("div");
                 heart.innerHTML = "❤️";
                 heart.className = "heart-fall";
@@ -49,7 +69,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // الميزة 3: ميزة القراءة الصوتية لرسائل البوت
+    // فتح شاشة جرعة الحب
+    capsuleBtn.onclick = () => {
+        const randomMsg = myLoveMessages[Math.floor(Math.random() * myLoveMessages.length)];
+        capsuleText.textContent = randomMsg;
+        capsuleModal.classList.add("show");
+        triggerHearts(true); // تشغيل القلوب إجبارياً عند فتح الجرعة
+    };
+
+    // إغلاق شاشة جرعة الحب
+    closeModal.onclick = () => capsuleModal.classList.remove("show");
+    capsuleModal.onclick = (e) => {
+        if (e.target === capsuleModal) capsuleModal.classList.remove("show");
+    };
+
+    // ميزة القراءة الصوتية
     function speakText(text) {
         window.speechSynthesis.cancel();
         const speech = new SpeechSynthesisUtterance(text);
@@ -58,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.speechSynthesis.speak(speech);
     }
 
-    // إدارة الجلسات والمحادثات
+    // إدارة الجلسات
     function loadSessions() {
         fetch("/api/sessions")
             .then(res => res.json())
@@ -71,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     titleSpan.textContent = session.title;
                     titleSpan.onclick = () => loadMessages(session.id, li);
                     
-                    // الميزة 1: زر حذف المحادثة الذكي
                     const deleteBtn = document.createElement("button");
                     deleteBtn.className = "delete-btn";
                     deleteBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
@@ -94,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     li.appendChild(deleteBtn);
                     sessionsList.appendChild(li);
 
-                    // تفعيل الجلسة الأولى تلقائياً عند الدخول لأول مرة لضمان عمل الإرسال
                     if (!currentSessionId && index === 0) {
                         loadMessages(session.id, li);
                     }
@@ -155,11 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        triggerHearts(text);
+        triggerHearts(false, text);
         appendMessage("Hanan", text);
         userInput.value = "";
         
-        // الميزة: إظهار الثلاث نقاط المتحركة (Typing indicator)
         const typingId = "typing-" + Date.now();
         const typingHTML = `<div class="typing-indicator" id="${typingId}" style="display: flex;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
         chatMessages.insertAdjacentHTML('beforeend', typingHTML);
