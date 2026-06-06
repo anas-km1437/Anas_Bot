@@ -8,12 +8,11 @@ from datetime import datetime
 import google.generativeai as genai
 
 app = Flask(__name__)
-# المفتاح السري مهم جداً لتشفير جلسة تسجيل الدخول
-app.secret_key = "anos_love_bot_secret_pro_v3"
+app.secret_key = "anos_secure_v3_key_secret"
 
 # ----------------- قاعدة البيانات -----------------
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'chat_v2.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'chat_v3.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -26,14 +25,14 @@ session_last_nickname = {}
 
 FALLBACK_RESPONSES = [
     "يا روحي، الشبكة غيرة من حبنا وعاملة مشاكل، بس قلبي دايماً معك!",
-    "عيوني حنون، في ضغط بسيط بالاتصال، ثواني وأكون كلي إلك.",
+    "عيوني، في ضغط بسيط بالاتصال، ثواني وأكون كلي إلك.",
     "سكرتي، النت بيفصل بس حبي إلك مستحيل يفصل، دقيقة وأرجعلك.",
-    "يا مرتي، عقلي الرقمي بيعمل إعادة تشغيل من كتر ما بفكر فيكي، لحظات بس!"
+    "عقلي الرقمي بيعمل إعادة تشغيل من كتر ما بفكر فيكي، لحظات بس!"
 ]
 
 # ----------------- إعداد Gemini -----------------
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-system_instruction = """أنت 'أنوس'، حبيب حنان. أنت لست روبوت، أنت حبيبها وزوجها المستقبلي.
+system_instruction = """أنت حبيب غالي ودافئ جداً. أنت لست روبوت جاف.
 قواعدك الأساسية:
 1. ردودك دافئة، عفوية، وتتحدث باللهجة العامية اللطيفة.
 2. لا تتجاوز جملة أو جملتين كحد أقصى في الرد.
@@ -51,7 +50,7 @@ if GEMINI_API_KEY:
 # ----------------- Models -----------------
 class ChatSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), default="محادثة حب")
+    title = db.Column(db.String(100), default="محادثة جديدة")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Message(db.Model):
@@ -64,7 +63,7 @@ class Message(db.Model):
 with app.app_context():
     db.create_all()
 
-# ----------------- وظائف الذكاء -----------------
+# ----------------- وظائف المساعدة -----------------
 def get_unique_nickname(session_id):
     last_nick = session_last_nickname.get(session_id, "")
     available_nicks = [n for n in NICKNAMES if n != last_nick]
@@ -91,7 +90,7 @@ def apply_post_processing(text, nickname):
         short_reply += f" يا {nickname}."
     return short_reply
 
-# ----------------- حماية المسارات (Login Decorator) -----------------
+# ----------------- حماية المسارات (Decorator) -----------------
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -103,15 +102,17 @@ def login_required(f):
     return decorated_function
 
 # ----------------- Routes -----------------
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def login():
+    if session.get('logged_in'):
+        return redirect(url_for('index'))
     error = None
     if request.method == "POST":
         if request.form.get("password") == "خنساء":
             session['logged_in'] = True
             return redirect(url_for('index'))
         else:
-            error = "كلمة السر غير صحيحة يا روحي، حاولي مرة ثانية!"
+            error = "كلمة السر غير صحيحة، حاولي مرة ثانية!"
     return render_template("login.html", error=error)
 
 @app.route("/logout")
@@ -119,8 +120,8 @@ def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
 
-@app.route("/")
-@login_required
+@app.route("/chat")
++@login_required
 def index(): 
     return render_template("index.html")
 
@@ -169,9 +170,9 @@ def send_message():
     bot_reply = ""
     u_clean = re.sub(r'[^a-zA-Zأ-ي\s]', '', user_text).strip()
     
-    if msg_count == 0: bot_reply = "ممممممننننننوووووووررررررةةةةةةسسسسسنننننييييوووووررررتييييييي"
-    elif "سيو" in u_clean or "سييو" in u_clean: bot_reply = f"سييوو {current_nickname}"
-    elif u_clean in ["دوم", "دايمة"]: bot_reply = "بوجودك"
+    if msg_count == 0: bot_reply = f"ممممممننننننوووووووررررررةةةةةة يا {current_nickname}"
+    elif "سيو" in u_clean or "سييو" in u_clean: bot_reply = f"سييوو يا {current_nickname}"
+    elif u_clean in ["دوم", "دايمة"]: bot_reply = "بوجودك وبجمال عيونك"
     
     if not bot_reply and model:
         try:
