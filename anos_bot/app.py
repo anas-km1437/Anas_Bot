@@ -24,7 +24,7 @@ session_last_nickname = {}
 
 FALLBACK_RESPONSES = [
     "يا روحي، الشبكة غيرة من حبنا وعاملة مشاكل، بس قلبي دايماً معك!",
-    "عيوني حنون، في ضغط بسيط بالاتصال، ثواني وأكون كلي إلك.",
+    "عيوني حنون، في ضغط بسيط بالاتصال, ثواني وأكون كلي إلك.",
     "سكرتي، النت بيفصل بس حبي إلك مستحيل يفصل، دقيقة وأرجعلك.",
     "يا مرتي، عقلي الرقمي بيعمل إعادة تشغيل من كتر ما بفكر فيكي، لحظات بس!"
 ]
@@ -91,7 +91,8 @@ def apply_post_processing(text, nickname):
 
 # ----------------- Routes -----------------
 @app.route("/")
-def index(): return render_template("index.html")
+def index(): 
+    return render_template("index.html")
 
 @app.route("/api/sessions", methods=["GET"])
 def get_sessions():
@@ -134,7 +135,7 @@ def send_message():
     u_clean = re.sub(r'[^a-zA-Zأ-ي\s]', '', user_text).strip()
     
     if msg_count == 0: bot_reply = "ممممممننننننوووووووررررررةةةةةةسسسسسنننننييييوووووررررتييييييي"
-    elif "سيو" in u_clean: bot_reply = f"سييوو {current_nickname}"
+    elif "سيو" in u_clean or "سييو" in u_clean: bot_reply = f"سييوو {current_nickname}"
     elif u_clean in ["دوم", "دايمة"]: bot_reply = "بوجودك"
     
     if not bot_reply and model:
