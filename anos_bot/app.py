@@ -134,7 +134,7 @@ def send_message():
     bot_reply = ""
     u_clean = re.sub(r'[^a-zA-Zأ-ي\s]', '', user_text).strip()
     
-    if msg_count == 0: bot_reply = "ممممممننننننوووووووررررررةةةةةة سسسسسنننننييييوووووررررتييييييي"
+    if msg_count == 0: bot_reply = "ممممممننننننوووووووررررررةةةةةةسسسسسنننننييييوووووررررتييييييي"
     elif "سيو" in u_clean or "سييو" in u_clean: bot_reply = f"سييوو {current_nickname}"
     elif u_clean in ["دوم", "دايمة"]: bot_reply = "بوجودك"
     
@@ -155,4 +155,4 @@ def send_message():
     return jsonify({"reply": bot_reply})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
