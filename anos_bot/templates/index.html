@@ -3,70 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>بوت</title>
+    <title>بوووت</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <div class="app-container" id="capture-area">
-        
-        <!-- قناع الهاتف عند فتح القائمة -->
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-        <!-- القائمة الجانبية -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fa-solid fa-heart"></i> ذكرياتنا</h2>
+                <h2><i class="fa-solid fa-heart"></i> القائمة</h2>
                 <div class="sidebar-actions">
-                    <button id="new-chat-btn" title="محادثة جديدة"><i class="fa-solid fa-plus"></i></button>
-                    <!-- زر تسجيل الخروج -->
-                    <a href="/logout" id="logout-btn" title="قفل المحادثة"><i class="fa-solid fa-lock"></i></a>
+                    <button id="new-chat-btn" title="جديد"><i class="fa-solid fa-plus"></i></button>
+                    <a href="/logout" id="logout-btn" title="خروج"><i class="fa-solid fa-lock"></i></a>
                     <button id="close-sidebar-btn" class="mobile-only"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             <ul id="sessions-list"></ul>
         </div>
 
-        <!-- منطقة الدردشة الرئيسية -->
         <div class="chat-area">
             <div class="chat-header">
-                <!-- زر فتح القائمة يظهر فقط على الهاتف -->
                 <button id="mobile-menu-btn" class="mobile-only"><i class="fa-solid fa-bars"></i></button>
-                
                 <div class="avatar-container">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="أنوس">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Bot">
                     <div class="online-dot"></div>
                 </div>
                 <div class="header-info">
-                    <h3>أنوس <span>حبيب قلبي</span></h3>
+                    <h3>مرحباً بك</h3>
                     <p>متصل الآن...</p>
                 </div>
-                
                 <div class="header-actions">
                     <button id="theme-btn" title="الوضع الليلي"><i class="fa-solid fa-moon"></i></button>
-                    <button id="download-btn" title="حفظ المحادثة"><i class="fa-solid fa-download"></i></button>
+                    <button id="download-btn" title="حفظ"><i class="fa-solid fa-download"></i></button>
                 </div>
             </div>
 
-            <div class="chat-messages" id="chat-messages">
-                <!-- الرسائل -->
-            </div>
+            <div class="chat-messages" id="chat-messages"></div>
 
             <div class="chat-input-container">
-                <input type="text" id="user-input" placeholder="اكتبي لـ أنوس يا روحي..." autocomplete="off">
+                <input type="text" id="user-input" placeholder="اكتبي شيئاً..." autocomplete="off">
                 <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
 
-    <!-- جرعة الحب -->
-    <button id="love-capsule-btn" class="floating-btn" title="خذي جرعة حب"><i class="fa-solid fa-capsules"></i></button>
+    <button id="love-capsule-btn" class="floating-btn" title="جرعة حب"><i class="fa-solid fa-capsules"></i></button>
 
     <div id="capsule-modal" class="modal-overlay">
         <div class="modal-content">
             <button id="close-modal"><i class="fa-solid fa-xmark"></i></button>
-            <h2>💊 جرعة حب من أنوس</h2>
+            <h2>رسالة لك</h2>
             <div class="capsule-body">
                 <i class="fa-solid fa-quote-right quote-icon"></i>
                 <p id="capsule-text"></p>
