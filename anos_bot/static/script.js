@@ -8,13 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadBtn = document.getElementById("download-btn");
     const newChatBtn = document.getElementById("new-chat-btn");
 
-    // عناصر الموبايل
     const sidebar = document.getElementById("sidebar");
     const mobileMenuBtn = document.getElementById("mobile-menu-btn");
     const closeSidebarBtn = document.getElementById("close-sidebar-btn");
     const sidebarOverlay = document.getElementById("sidebar-overlay");
 
-    // عناصر جرعة الحب
     const capsuleBtn = document.getElementById("love-capsule-btn");
     const capsuleModal = document.getElementById("capsule-modal");
     const closeModal = document.getElementById("close-modal");
@@ -24,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "أنتِ النور اللي ضوّى حياتي، وكل يوم معك هو أحلى يوم بعمري.",
         "لو جمعت كل كلمات الحب بالدنيا، ما توفي حق عيونك الحلوين.",
         "ضحكتك هي الأغنية المفضلة لقلبي، لا تحرميني منها أبداً.",
-        "بحبك مش بس لأنك حبيبتي، بحبك لأنك أقرب حد لروحي وتوأمي.",
+        "بحبك مش بس لأنك غالية، بحبك لأنك أقرب حد لروحي وتوأمي.",
         "وقت أكون معك، بنسى كل تعب الدنيا. أنتِ راحتي وأماني.",
         "بتعرفي إنك أحلى صدفة بحياتي؟ يا ريتني عرفتك من زمان.",
         "مهما بعدتنا المسافات أو الظروف، رح تضلي بقلبي ملكة متوجة.",
@@ -33,10 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
         "وجودك بيكفيني عن كل العالم، أنتِ عالمي كله."
     ];
 
-    // دالة للتحقق من صلاحية الجلسة
     function handleResponse(response) {
         if (response.status === 401) {
-            window.location.href = "/login";
+            window.location.href = "/";
             throw new Error("Unauthorized");
         }
         return response.json();
@@ -254,7 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // تشغيل جلب الجلسات فقط إذا كنا في الصفحة الرئيسية (وليس صفحة تسجيل الدخول)
     if(document.getElementById("sessions-list")) {
         loadSessions();
     }
