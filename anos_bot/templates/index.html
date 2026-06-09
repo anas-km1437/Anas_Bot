@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anous Bot - عالمنا الدافئ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- مكتبة التقاط صور المحادثة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <!-- القائمة الجانبية لإدارة المحادثات -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h3>محادثاتنا 💞</h3>
+            <button onclick="toggleTheme()" style="background:none; border:none; cursor:pointer; font-size:20px;">🌓</button>
+        </div>
+        <div class="padding-15">
+            <button class="new-chat-btn" onclick="createNewSession()">محادثة جديدة ➕</button>
+        </div>
+        <div class="sessions-list" id="sessionsList">
+            <!-- سيتم تحميل المحادثات ديناميكياً هنا -->
+        </div>
+        <div style="padding: 15px; border-top: 1px solid var(--border-color);">
+            <a href="{{ url_for('logout') }}" style="color: var(--primary-color); text-decoration: none; font-weight: bold;">تسجيل الخروج 🚪</a>
+        </div>
+    </div>
+
+    <!-- منطقة المحادثة الرئيسية -->
+    <div class="main-chat-area">
+        <!-- التوب بار العلوي -->
+        <div class="top-bar">
+            <h2 id="chatTitle">اختر محادثة أو ابدأ واحدة جديدة...</h2>
+            <button class="new-chat-btn" style="width:auto; padding: 8px 15px;" onclick="captureChat()">حفظ كصورة 📸</button>
+        </div>
+
+        <!-- زر كبسولة الحب العائم -->
+        <button class="love-capsule-btn" onclick="openLoveCapsule()">جرعة حب 💊</button>
+
+        <!-- حاوية الرسائل المتبادلة -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="message bot">مرحباً بك يا نبضي في عالمنا الخاص.. كيف حال قلبك اليوم؟</div>
+        </div>
+
+        <!-- صندوق الكتابة السفلي (الثابت والمميز في الموبايل) -->
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="اكتب لي ما تشعر به هنا..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">❤️</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
