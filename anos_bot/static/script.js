@@ -1,174 +1,104 @@
-let currentSessionId = null;
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const loveDoseBtn = document.getElementById('love-dose-btn');
+const screenshotBtn = document.getElementById('screenshot-btn');
 
-const loveQuotes = [
-    "أنت لست جزءاً مني، أنت كلي وعالمي الصغير. 🌸",
-    "كل نبضة في قلبي تخبرك كم أنا محظوظ بوجودك. ✨",
-    "لا يهمني هذا العالم، ما دمت ممسكاً بيدي. 🥺",
-    "ضحكتك هي الموسيقى المفضلة لقلبي دائماً. 💕",
-    "وجودك بجانبي يجعل كل شيء صعب يبدو سهلاً وجميلاً."
-];
+// التمرير للأسفل دائماً
+function scrollToBottom() {
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-    // تفعيل الثيم المحفوظ بالمتصفح
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.documentElement.setAttribute("data-theme", savedTheme);
+// إضافة رسالة للواجهة
+function appendMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message');
+    msgDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
     
-    loadSessions();
-});
-
-function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute("data-theme");
-    const newTheme = currentTheme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-}
-
-function loadSessions() {
-    fetch('/api/sessions')
-        .then(res => res.json())
-        .then(sessions => {
-            const list = document.getElementById("sessionsList");
-            list.innerHTML = "";
-            sessions.forEach(s => {
-                const item = document.createElement("div");
-                item.classList.add("session-item");
-                if(s.id === currentSessionId) item.classList.add("active");
-                item.innerText = s.title;
-                item.onclick = () => selectSession(s.id, s.title);
-                list.appendChild(item);
-            });
-        });
-}
-
-function createNewSession() {
-    fetch('/api/sessions', { method: 'POST' })
-        .then(res => res.json())
-        .then(session => {
-            currentSessionId = session.id;
-            loadSessions();
-            selectSession(session.id, session.title);
-        });
-}
-
-function selectSession(id, title) {
-    currentSessionId = id;
-    document.getElementById("chatTitle").innerText = title;
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('msg-content');
+    contentDiv.textContent = text;
     
-    // تمييز العنصر النشط
-    document.querySelectorAll('.session-item').forEach(item => item.classList.remove('active'));
-    loadMessages(id);
-}
-
-function loadMessages(sessionId) {
-    fetch(`/api/sessions/${sessionId}/messages`)
-        .then(res => res.json())
-        .then(messages => {
-            const container = document.getElementById("messagesContainer");
-            container.innerHTML = "";
-            
-            messages.forEach(m => {
-                appendMessage(m.sender, m.text);
-            });
-            scrollToBottom();
-        });
-}
-
-function appendMessage(sender, text) {
-    const container = document.getElementById("messagesContainer");
-    const msgDiv = document.createElement("div");
-    msgDiv.classList.add("message", sender);
-    msgDiv.innerText = text;
-    container.appendChild(msgDiv);
+    msgDiv.appendChild(contentDiv);
+    chatBox.appendChild(msgDiv);
     scrollToBottom();
 }
 
-function handleKeyPress(e) {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-}
-
-function sendMessage() {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
+// إرسال الرسالة للخادم
+async function sendMessage() {
+    const text = userInput.value.trim();
     if (!text) return;
 
-    if (!currentSessionId) {
-        alert("من فضلك اختر محادثة أولاً أو اضغط على محادثة جديدة! 💕");
-        return;
-    }
+    appendMessage(text, 'user');
+    userInput.value = '';
 
-    appendMessage('user', text);
-    input.value = "";
-
-    showTypingIndicator();
-
-    fetch(`/api/sessions/${currentSessionId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text })
-    })
-    .then(res => res.json())
-    .then(data => {
-        removeTypingIndicator();
-        appendMessage('bot', data.text);
-    })
-    .catch(() => {
-        removeTypingIndicator();
-    });
-}
-
-function showTypingIndicator() {
-    removeTypingIndicator();
-    const container = document.getElementById("messagesContainer");
-    const indicator = document.createElement("div");
-    indicator.id = "typingIndicator";
-    indicator.classList.add("typing-indicator");
-    indicator.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
-    container.appendChild(indicator);
-    scrollToBottom();
-}
-
-function removeTypingIndicator() {
-    const indicator = document.getElementById("typingIndicator");
-    if (indicator) indicator.remove();
-}
-
-function scrollToBottom() {
-    const container = document.getElementById("messagesContainer");
-    container.scrollTop = container.scrollHeight;
-}
-
-// كبسولة الحب واحتفالية تساقط القلوب
-function openLoveCapsule() {
-    const randomQuote = loveQuotes[Math.floor(Math.random() * loveQuotes.length)];
-    appendMessage('bot', randomQuote);
-    
-    // إطلاق تأثير القلوب المتساقطة
-    for (let i = 0; i < 15; i++) {
-        setTimeout(createHeart, i * 150);
+    try {
+        const response = await fetch('/api/send_message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        
+        const data = await response.json();
+        if(data.response) {
+            appendMessage(data.response, 'bot');
+        }
+    } catch (error) {
+        appendMessage("عذراً، هناك مشكلة في الاتصال بالخادم.", 'bot');
     }
 }
 
-function createHeart() {
-    const heart = document.createElement("div");
-    heart.classList.add("heart-fall");
-    heart.innerText = ["❤️", "💖", "💝", "💕", "🌸"][Math.floor(Math.random() * 5)];
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.animationDuration = Math.random() * 2 + 2 + "s";
-    document.body.appendChild(heart);
-    
-    setTimeout(() => { heart.remove(); }, 4000);
-}
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
 
-// التقاط لقطة شاشة للمحادثة وتحميلها كصورة للذكريات
-function captureChat() {
-    const container = document.getElementById("messagesContainer");
-    html2canvas(container, { backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() })
-    .then(canvas => {
+// جرعة الحب
+loveDoseBtn.addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/love_dose');
+        const data = await response.json();
+        appendMessage(data.dose, 'bot');
+        createFallingHearts(); // تأثير القلوب
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+// التقاط الشاشة
+screenshotBtn.addEventListener('click', () => {
+    html2canvas(document.querySelector(".main-container")).then(canvas => {
         const link = document.createElement('a');
-        link.download = `ذكرياتنا_${new Date().toLocaleDateString()}.png`;
+        link.download = 'anous_chat.png';
         link.href = canvas.toDataURL();
         link.click();
     });
+});
+
+// تأثير القلوب المتساقطة
+function createFallingHearts() {
+    const container = document.getElementById('hearts-container');
+    for(let i=0; i<15; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.innerHTML = '💖';
+            heart.style.position = 'fixed';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.top = '-5vh';
+            heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            heart.style.transition = 'transform 3s linear, top 3s linear, opacity 3s linear';
+            heart.style.zIndex = '9999';
+            
+            container.appendChild(heart);
+            
+            setTimeout(() => {
+                heart.style.top = '100vh';
+                heart.style.opacity = '0';
+            }, 50);
+            
+            setTimeout(() => {
+                heart.remove();
+            }, 3000);
+        }, i * 200);
+    }
 }
