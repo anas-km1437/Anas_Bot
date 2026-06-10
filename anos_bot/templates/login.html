@@ -2,20 +2,28 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - أنوس</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>بوابة الدخول</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="dark-mode login-body">
+<body class="login-body">
     <div class="login-container">
-        <h1>مرحباً بك في عالم أنوس 💖</h1>
-        <form method="POST">
-            <input type="password" name="password" placeholder="أدخل كلمة السر (خنساء)..." required>
-            <button type="submit" class="btn">دخول</button>
-        </form>
-        {% if error %}
+        <div class="login-header">
+            <div class="heart-lock">
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-lock lock-icon"></i>
+            </div>
+            <h2>بوابة الدخول</h2>
+            <p>أدخلي كلمة السر للوصول إلى عالمك الخاص</p>
+        </div>
+        <form method="POST" class="login-form">
+            <input type="password" name="password" placeholder="اكتبي كلمة السر هنا..." autocomplete="off" required>
+            <button type="submit">دخول <i class="fa-solid fa-arrow-left"></i></button>
+            {% if error %}
             <p class="error-msg">{{ error }}</p>
-        {% endif %}
+            {% endif %}
+        </form>
     </div>
 </body>
 </html>
