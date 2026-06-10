@@ -2,34 +2,65 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أنوس - شات</title>
+    <!-- منع التقريب التلقائي في الجوال لثبات الكتابة -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>أنوس</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <!-- مكتبة التقاط الشاشة -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="dark-mode">
-    <div id="hearts-container"></div>
-    
-    <div class="main-container">
-        <header class="chat-header">
-            <h1>أنوس 🤖💖</h1>
-            <div class="header-buttons">
-                <button id="love-dose-btn" class="btn">💊 جرعة حب</button>
-                <button id="screenshot-btn" class="btn">📸 حفظ للذكرى</button>
-            </div>
-        </header>
+<body>
+    <div class="app-container" id="capture-area">
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-        <main class="chat-box" id="chat-box">
-            <div class="message bot-message">
-                <div class="msg-content">أهلاً بك! أنا أنوس، كيف يمكنني إسعادك اليوم؟ ✨</div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-heart"></i> ذكرياتنا</h2>
+                <div class="sidebar-actions">
+                    <button id="new-chat-btn" title="محادثة جديدة"><i class="fa-solid fa-plus"></i></button>
+                    <a href="/logout" id="logout-btn" title="قفل المحادثة"><i class="fa-solid fa-lock"></i></a>
+                    <button id="close-sidebar-btn" class="mobile-only"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
-        </main>
+            <ul id="sessions-list"></ul>
+        </div>
 
-        <footer class="input-area">
-            <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
-            <button id="send-btn">إرسال</button>
-        </footer>
+        <div class="chat-area">
+            <div class="chat-header">
+                <button id="mobile-menu-btn" class="mobile-only"><i class="fa-solid fa-bars"></i></button>
+                <div class="avatar-container">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Bot">
+                    <div class="online-dot"></div>
+                </div>
+                <div class="header-info">
+                    <h3>أنوس <span>متصل</span></h3>
+                    <p>متصل الآن...</p>
+                </div>
+                <div class="header-actions">
+                    <button id="theme-btn" title="الوضع الليلي"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chat-messages"></div>
+
+            <div class="chat-input-container">
+                <input type="text" id="user-input" placeholder="اكتبي شيئاً يا روحي..." autocomplete="off">
+                <button id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <button id="love-capsule-btn" class="floating-btn" title="خذي جرعة حب"><i class="fa-solid fa-capsules"></i></button>
+
+    <div id="capsule-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <h2>💊 جرعة حب دافئة</h2>
+            <div class="capsule-body">
+                <i class="fa-solid fa-quote-right quote-icon"></i>
+                <p id="capsule-text"></p>
+                <i class="fa-solid fa-quote-left quote-icon"></i>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
