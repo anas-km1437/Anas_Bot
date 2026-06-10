@@ -187,7 +187,9 @@ def send_message():
             prompt = f"{user_text}\n\n[تعليمات: {analyze_mood(user_text)}. يجب أن يتضمن ردك اللقب '{current_nickname}'.]"
             response = model.start_chat(history=formatted_history).send_message(prompt)
             bot_reply = apply_post_processing(response.text, current_nickname)
-        except: bot_reply = random.choice(FALLBACK_RESPONSES)
+        except Exception as e: 
+            print(f"=========== GEMINI ERROR ===========\n{e}\n====================================")
+            bot_reply = random.choice(FALLBACK_RESPONSES)
     elif not bot_reply: bot_reply = random.choice(FALLBACK_RESPONSES)
 
     db.session.add(Message(session_id=session_id, sender="AnosBot", text=bot_reply))
